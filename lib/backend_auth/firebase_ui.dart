@@ -1,4 +1,9 @@
+// ignore_for_file: camel_case_types
 
+import 'package:exam_store/main_page/screens/quiz_screen.dart';
+import 'package:exam_store/stream/natural.dart';
+import 'package:exam_store/stream/select.dart';
+import 'package:exam_store/stream/selector.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -12,6 +17,7 @@ class myapping extends StatelessWidget {
     final providers = [EmailAuthProvider()];
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.teal,
         brightness: Brightness.light,
@@ -31,8 +37,6 @@ class myapping extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-
-
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(Colors.teal),
@@ -76,18 +80,18 @@ class myapping extends StatelessWidget {
         ),
       ),
       initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/profile',
+          FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
+        '/natural':(context)=> const NaturalSubjects(),
+        '/selection':(context)=> const QuizScreen(),
+        '/home': (context) => const Select(),
         '/sign-in': (context) => SignInScreen(
               providers: providers,
               headerMaxExtent: 200,
-              
               actions: [
-
                 AuthStateChangeAction<SignedIn>((context, state) {
-                  Navigator.pushReplacementNamed(context, '/profile');
+                  Navigator.pushReplacementNamed(context, '/home');
                 }),
-
                 AuthStateChangeAction<UserCreated>((context, state) {
                   Navigator.pushReplacementNamed(context, '/profile');
                 }),
@@ -119,7 +123,7 @@ class myapping extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                         const Text(
+                        const Text(
                           'Welcome to myapping!',
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
@@ -129,36 +133,30 @@ class myapping extends StatelessWidget {
                           height: 300,
                         ),
                         const SizedBox(height: 20),
-                       
                       ],
                     ),
                   ),
-
-                
                 );
               },
-
-              
             ),
         '/profile': (context) => ProfileScreen(
               providers: providers,
+              showDeleteConfirmationDialog: true,
               actions: [
                 SignedOutAction((context) {
                   Navigator.pushReplacementNamed(context, '/sign-in');
                 }),
+            AccountDeletedAction((context, user) {
+              Navigator.pushReplacementNamed(context, '/sign-in');
+
+    }),
+              ],
+              children: const [
+                Selector()
+                
               ],
             ),
       },
     );
   }
 }
-
-
-
-
-
-
-
-
-
-

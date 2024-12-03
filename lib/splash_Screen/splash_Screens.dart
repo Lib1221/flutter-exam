@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, file_names
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:exam_store/backend_auth/firebase_ui.dart';
 import 'package:flutter/material.dart';
