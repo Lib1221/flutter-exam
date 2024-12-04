@@ -83,7 +83,6 @@ class myapping extends StatelessWidget {
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
         '/natural':(context)=> const NaturalSubjects(),
-        '/selection':(context)=> const QuizScreen(),
         '/home': (context) => const Select(),
         '/sign-in': (context) => SignInScreen(
               providers: providers,

@@ -1,4 +1,4 @@
-import 'package:exam_store/main_page/models/questions.dart';
+import 'package:exam_store/main_page/models/question.dart';
 import 'package:flutter/material.dart';
 
 
@@ -6,8 +6,10 @@ class ResultScreen extends StatelessWidget {
   const ResultScreen({
     super.key,
     required this.score,
+    required this.len
   });
   final int score;
+  final int len;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +32,7 @@ class ResultScreen extends StatelessWidget {
                 width: 250,
                 child: CircularProgressIndicator(
                   strokeWidth: 10,
-                  value: score / 10,
+                  value: score / len,
                   color: Colors.green,
                   backgroundColor: Colors.white,
                 ),
@@ -43,13 +45,16 @@ class ResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '${(score / questions.length * 100).round()}%',
+                    '${(score / len * 100).round()}%',
                     style: const TextStyle(fontSize: 25),
                   )
                 ],
               ),
             ],
           ),
+          ElevatedButton(onPressed: (){
+              Navigator.pushNamed(context,'/natural');
+          }, child: const Text('Go back'))
         ],
       ),
     );
