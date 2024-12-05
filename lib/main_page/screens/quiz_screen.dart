@@ -6,9 +6,16 @@ import 'package:exam_store/main_page/screens/result_screen.dart';
 import 'package:flutter/material.dart';
 
 class QuizScreen extends StatefulWidget {
-  final String collectionPath; 
-
-  QuizScreen({required this.collectionPath});
+  final String collectionPath;
+  final String year;
+  final String unit;
+  final String grade;
+  QuizScreen({
+    required this.collectionPath,
+    required this.year,
+    required this.unit,
+    required this.grade,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -23,14 +30,16 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    dataRetrive(); // Call dataRetrive here
-
+    dataRetrive(widget.grade, widget.year, widget.unit); // Call dataRetrive here
   }
 
-  Future<void> dataRetrive() async {
+  Future<void> dataRetrive(String grade, String year, String unit) async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection(widget.collectionPath)
+          .where('grade', isEqualTo: grade)
+          .where('year', isEqualTo: year)
+          .where('unit', isEqualTo: unit)
           .get();
 
       if (snapshot.docs.isNotEmpty) {
@@ -65,7 +74,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (questions.isEmpty) { // Show loading or empty state while fetching questions
+    if (questions.isEmpty) {
+      // Show loading or empty state while fetching questions
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -94,12 +104,19 @@ class _QuizScreenState extends State<QuizScreen> {
               style: const TextStyle(fontSize: 21),
               textAlign: TextAlign.center,
             ),
+            Text(
+              (question.year + question.grade + question.unit),
+              style: const TextStyle(fontSize: 21),
+              textAlign: TextAlign.center,
+            ),
             ListView.builder(
               shrinkWrap: true,
               itemCount: question.options.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: selectedAnswerIndex == null ? () => pickAnswer(index) : null,
+                  onTap: selectedAnswerIndex == null
+                      ? () => pickAnswer(index)
+                      : null,
                   child: AnswerCard(
                     currentIndex: index,
                     question: question.options[index],
@@ -115,7 +132,10 @@ class _QuizScreenState extends State<QuizScreen> {
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (_) => ResultScreen(score: score, len: questions.length,),
+                          builder: (_) => ResultScreen(
+                            score: score,
+                            len: questions.length,
+                          ),
                         ),
                       );
                     },
