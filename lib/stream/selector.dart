@@ -6,17 +6,24 @@ class Selector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: (){
-               Navigator.pushReplacementNamed(context, '/natural');
-            }, child: const Text('Natural science')),
-            const SizedBox(height: 40,),
-            ElevatedButton(onPressed: (){}, child: const Text('Social science')),
-          ],
-        ),
-      );
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/natural');
+              },
+              child: const Text('Natural science')),
+          const SizedBox(
+            height: 40,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                print('');
+              },
+              child: const Text('Social science')),
+        ],
+      ),
+    );
   }
 }
