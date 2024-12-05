@@ -1,6 +1,5 @@
 // ignore_for_file: camel_case_types
 
-import 'package:exam_store/main_page/screens/quiz_screen.dart';
 import 'package:exam_store/stream/natural.dart';
 import 'package:exam_store/stream/select.dart';
 import 'package:exam_store/stream/selector.dart';
