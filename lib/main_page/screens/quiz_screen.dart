@@ -10,7 +10,7 @@ class QuizScreen extends StatefulWidget {
   final String year;
   final String unit;
   final String grade;
-  QuizScreen({
+  const QuizScreen({
     required this.collectionPath,
     required this.year,
     required this.unit,

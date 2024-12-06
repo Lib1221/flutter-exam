@@ -11,6 +11,7 @@ analyzer:
   errors:
     must_be_immutable: ignore
     prefer_const_constructors_in_immutables: ignore ignore
+    use_key_in_widget_constructors: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:
