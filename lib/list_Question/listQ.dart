@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ListQuestions extends StatefulWidget {
   final String collectionPath;
 
-  ListQuestions({required this.collectionPath});
+  const ListQuestions({required this.collectionPath});
 
   @override
   State<ListQuestions> createState() => _ListQuestionsState();
