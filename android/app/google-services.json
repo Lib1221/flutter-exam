@@ -9,10 +9,15 @@
       "client_info": {
         "mobilesdk_app_id": "1:242675705969:android:d3657d7fb061e8b80f13d0",
         "android_client_info": {
-          "package_name": "com.exam.paper"
+          "package_name": "com.example.exam_store"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "242675705969-ctdro248kacl9408j5gvrqlmdt1jctqm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBXm7IVMBzLQJAR4e3hWuQ8vRZLqw-Kx6M"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242675705969-ctdro248kacl9408j5gvrqlmdt1jctqm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "242675705969-8pv6dbu5vokkmek25nbghv54b71lrroj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.examStore"
+              }
+            }
+          ]
         }
       }
     }

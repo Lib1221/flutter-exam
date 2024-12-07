@@ -1,6 +1,5 @@
 // ignore_for_file: camel_case_types
 
-import 'package:exam_store/main_page/screens/quiz_screen.dart';
 import 'package:exam_store/stream/natural.dart';
 import 'package:exam_store/stream/select.dart';
 import 'package:exam_store/stream/selector.dart';
@@ -83,7 +82,6 @@ class myapping extends StatelessWidget {
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
         '/natural':(context)=> const NaturalSubjects(),
-        '/selection':(context)=> const QuizScreen(),
         '/home': (context) => const Select(),
         '/sign-in': (context) => SignInScreen(
               providers: providers,
@@ -107,7 +105,7 @@ class myapping extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        'Welcome to myapping!',
+                        'Welcome to Examers!',
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
@@ -124,7 +122,7 @@ class myapping extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Welcome to myapping!',
+                          'Welcome to Examers!',
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
                         ),

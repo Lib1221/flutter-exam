@@ -1,12 +1,21 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_store/main_page/answer_card.dart';
-import 'package:exam_store/main_page/models/questions.dart';
+import 'package:exam_store/main_page/models/question.dart';
 import 'package:exam_store/main_page/next_button.dart';
 import 'package:exam_store/main_page/screens/result_screen.dart';
 import 'package:flutter/material.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  final String collectionPath;
+  final String year;
+  final String unit;
+  final String grade;
+  const QuizScreen({
+    required this.collectionPath,
+    required this.year,
+    required this.unit,
+    required this.grade,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -16,6 +25,35 @@ class _QuizScreenState extends State<QuizScreen> {
   int? selectedAnswerIndex;
   int questionIndex = 0;
   int score = 0;
+  List<Question> questions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    dataRetrive(widget.grade, widget.year, widget.unit); // Call dataRetrive here
+  }
+
+  Future<void> dataRetrive(String grade, String year, String unit) async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection(widget.collectionPath)
+          .where('grade', isEqualTo: grade)
+          .where('year', isEqualTo: year)
+          .where('unit', isEqualTo: unit)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        questions = snapshot.docs.map((doc) {
+          return Question.fromDocument(doc);
+        }).toList();
+        setState(() {});
+      } else {
+        print("No questions found.");
+      }
+    } catch (e) {
+      print("Error retrieving data: $e");
+    }
+  }
 
   void pickAnswer(int value) {
     selectedAnswerIndex = value;
@@ -25,8 +63,6 @@ class _QuizScreenState extends State<QuizScreen> {
     }
     setState(() {});
   }
-
-  
 
   void goToNextQuestion() {
     if (questionIndex < questions.length - 1) {
@@ -38,15 +74,24 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (questions.isEmpty) {
+      // Show loading or empty state while fetching questions
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final question = questions[questionIndex];
     bool isLastQuestion = questionIndex == questions.length - 1;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quiz App'),
         actions: [
-          IconButton(onPressed: (){
-            Navigator.pushReplacementNamed(context, '/profile');
-          }, icon: const Icon(Icons.person))
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/profile');
+            },
+            icon: const Icon(Icons.person),
+          ),
         ],
       ),
       body: Padding(
@@ -56,9 +101,12 @@ class _QuizScreenState extends State<QuizScreen> {
           children: [
             Text(
               question.question,
-              style: const TextStyle(
-                fontSize: 21,
-              ),
+              style: const TextStyle(fontSize: 21),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              (question.year + question.grade + question.unit),
+              style: const TextStyle(fontSize: 21),
               textAlign: TextAlign.center,
             ),
             ListView.builder(
@@ -79,7 +127,6 @@ class _QuizScreenState extends State<QuizScreen> {
                 );
               },
             ),
-            // Next Button
             isLastQuestion
                 ? RectangularButton(
                     onPressed: () {
@@ -87,6 +134,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         MaterialPageRoute(
                           builder: (_) => ResultScreen(
                             score: score,
+                            len: questions.length,
                           ),
                         ),
                       );

@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '242675705969',
     projectId: 'exam-37b46',
     storageBucket: 'exam-37b46.firebasestorage.app',
+    iosClientId: '242675705969-8pv6dbu5vokkmek25nbghv54b71lrroj.apps.googleusercontent.com',
     iosBundleId: 'com.example.examStore',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '242675705969',
     projectId: 'exam-37b46',
     storageBucket: 'exam-37b46.firebasestorage.app',
+    iosClientId: '242675705969-8pv6dbu5vokkmek25nbghv54b71lrroj.apps.googleusercontent.com',
     iosBundleId: 'com.example.examStore',
   );
 
@@ -85,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'exam-37b46.firebasestorage.app',
     measurementId: 'G-TGMZ5N42NW',
   );
+
 }
