@@ -42,6 +42,7 @@ dependencies:
   firebase_ui_auth: ^1.16.0
   flutter_svg:
   flutter_heatmap_calendar: ^1.0.5
+  shared_preferences:
 dev_dependencies:
   flutter_test:
     sdk: flutter

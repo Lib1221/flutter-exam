@@ -1,8 +1,7 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HeatmapCalendarPage extends StatefulWidget {
   @override
@@ -16,12 +15,25 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
   int c = 0;
   int zero = 1;
 
-  void startTimer() {
+  @override
+  void initState() {
+    super.initState();
+    _restoreState();
+  }
+
+  void startTimer() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    prefs.setBool('is_Canceled', false);
+    prefs.setInt('remainingTime', _start);
+    prefs.setInt('startTime', now);
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start > 0 && c == 0) {
         setState(() {
           _start--;
         });
+        prefs.setInt('remainingTime', _start);
       } else {
         timer.cancel();
         showCompletionMessage(zero == 1 ? 'Time is up!' : 'Time canceled');
@@ -38,7 +50,9 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
     });
   }
 
-  void Stop() {
+  void Stop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('is_Canceled', true);
     _timer = Timer.periodic(const Duration(seconds: 0), (timer) {
       timer.cancel();
       setState(() {
@@ -55,6 +69,25 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  Future<void> _restoreState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final is_Canceled = prefs.getBool('is_Canceled') ?? true;
+    final savedTime = prefs.getInt('remainingTime') ?? 3600;
+    final startTime =
+        prefs.getInt('startTime') ?? DateTime.now().millisecondsSinceEpoch;
+
+    final elapsed = DateTime.now().millisecondsSinceEpoch - startTime;
+    final remainingTime = savedTime - (elapsed ~/ 1000);
+
+  if (!is_Canceled && remainingTime > 0) {
+      setState(() {
+        _start = remainingTime;
+      });
+
+      startTimer();
+    }
   }
 
   String formatTime(int seconds) {
@@ -81,22 +114,8 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                 colorMode: ColorMode.color,
                 flexible: false,
                 datasets: {
-                  DateTime(2024, 12, 1): 1,
-                  DateTime(2024, 12, 2): 2,
-                  DateTime(2024, 12, 3): 3,
-                  DateTime(2024, 12, 4): 4,
-                  DateTime(2024, 12, 5): 5,
-                  DateTime(2024, 12, 6): 1,
-                  DateTime(2024, 12, 7): 2,
-                  DateTime(2024, 12, 8): 3,
-                  DateTime(2024, 12, 9): 4,
-                  DateTime(2024, 12, 10): 5,
-                  DateTime(2024, 12, 11): 3,
-                  DateTime(2024, 12, 12): 5,
-                  DateTime(2024, 12, 13): 1,
-                  DateTime(2024, 12, 14): 1,
-                  DateTime(2024, 12, 15): 3,
-                  DateTime(2024, 12, 5): 5,
+                  
+                  DateTime.now(): 2,
 
                   //it takes current date value and then add to or append it
                   // DateTime(year,month,day):_heatmapper
@@ -139,9 +158,6 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
             const Text("Top Rated student "),
             const Divider(
               height: 10,
@@ -154,7 +170,8 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                   itemCount: 10,
                   itemBuilder: (context, index) {
                     return Card(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 30),
                       elevation: 10,
                       child: Padding(
                         padding: const EdgeInsets.all(10),

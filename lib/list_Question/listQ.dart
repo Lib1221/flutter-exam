@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_store/main_page/screens/quiz_screen.dart';
+import 'package:exam_store/main_page/screens/result_screen.dart';
 import 'package:flutter/material.dart';
 
 class ListQuestions extends StatefulWidget {
@@ -166,10 +167,16 @@ class _ListQuestionsState extends State<ListQuestions> {
               ),
             );
           },
-          child: Text(
-            'Grade $grade - Unit $unit (Questions Count: $itemCount)',
-            style:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          child: Row(
+            children: [
+              Text(
+                'Grade $grade - Unit $unit (Questions Count: $itemCount)',
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+
+              percentage(0, 10)
+            ],
           ),
         ),
       ),

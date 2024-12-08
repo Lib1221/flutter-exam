@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
-
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({
-    super.key,
-    required this.score,
-    required this.len
-  });
+  const ResultScreen({super.key, required this.score, required this.len});
   final int score;
   final int len;
   @override
@@ -23,7 +18,20 @@ class ResultScreen extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          Stack(
+          percentage(score, len),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/natural');
+              },
+              child: const Text('Go back'))
+        ],
+      ),
+    );
+  }
+}
+
+Widget percentage(int score, int len) {
+  return Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
@@ -50,12 +58,5 @@ class ResultScreen extends StatelessWidget {
                 ],
               ),
             ],
-          ),
-          ElevatedButton(onPressed: (){
-              Navigator.pushNamed(context,'/natural');
-          }, child: const Text('Go back'))
-        ],
-      ),
-    );
-  }
+          );
 }
