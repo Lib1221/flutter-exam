@@ -3,6 +3,7 @@ import 'package:exam_store/main_page/answer_card.dart';
 import 'package:exam_store/main_page/models/question.dart';
 import 'package:exam_store/main_page/next_button.dart';
 import 'package:exam_store/main_page/screens/result_screen.dart';
+import 'package:exam_store/progress/daily.dart';
 import 'package:flutter/material.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -86,6 +87,17 @@ class _QuizScreenState extends State<QuizScreen> {
       appBar: AppBar(
         title: const Text('Quiz App'),
         actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyan
+            ),
+            onPressed: (){
+            Navigator.push(context, MaterialPageRoute(
+          builder: (context) => HeatmapCalendarPage()),);
+          }, 
+          child: const Text('Progress Tracker'))
+          ,
+          
           IconButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/profile');

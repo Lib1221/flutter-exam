@@ -1,4 +1,9 @@
+// ignore_for_file: avoid_types_as_parameter_names
+
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:exam_store/user/User.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,11 +19,22 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
   int _heatmapper = 0;
   int c = 0;
   int zero = 1;
-
+  Map<DateTime, int> dailyStrikes = {};
   @override
   void initState() {
     super.initState();
     _restoreState();
+    saveDailyStrikeData(5);
+    _loadDailyStrikes();
+    ;
+  }
+
+  Future<void> _loadDailyStrikes() async {
+    dailyStrikes = await getDailyStrikeData();
+    setState(() {
+      print(dailyStrikes);
+      print(DateTime(2024, 1, 6));
+    });
   }
 
   void startTimer() async {
@@ -81,7 +97,7 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
     final elapsed = DateTime.now().millisecondsSinceEpoch - startTime;
     final remainingTime = savedTime - (elapsed ~/ 1000);
 
-  if (!is_Canceled && remainingTime > 0) {
+    if (!is_Canceled && remainingTime > 0) {
       setState(() {
         _start = remainingTime;
       });
@@ -113,24 +129,13 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                 defaultColor: Colors.white,
                 colorMode: ColorMode.color,
                 flexible: false,
-                datasets: {
-                  
-                  DateTime.now(): 2,
-
-                  //it takes current date value and then add to or append it
-                  // DateTime(year,month,day):_heatmapper
-                },
+                datasets: dailyStrikes,
                 colorsets: const {
                   1: Color.fromARGB(255, 141, 221, 201),
                   2: Color.fromARGB(255, 59, 162, 100),
                   3: Color.fromARGB(255, 15, 35, 212),
                   4: Color.fromARGB(255, 190, 255, 9),
                   5: Color.fromARGB(255, 206, 22, 22),
-                  6: Color.fromARGB(255, 141, 221, 201),
-                  7: Color.fromARGB(255, 59, 162, 100),
-                  8: Color.fromARGB(255, 15, 35, 212),
-                  9: Color.fromARGB(255, 190, 255, 9),
-                  10: Color.fromARGB(255, 206, 22, 22)
                 },
                 onClick: (value) {
                   ScaffoldMessenger.of(context)

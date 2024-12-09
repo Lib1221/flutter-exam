@@ -1,5 +1,6 @@
 import 'package:exam_store/firebase_options.dart';
 import 'package:exam_store/progress/daily.dart';
+import 'package:exam_store/splash_Screen/splash_Screens.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -9,9 +10,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   return runApp(
-    MaterialApp(
+    const MaterialApp(
       debugShowCheckedModeBanner: false,
-    home: HeatmapCalendarPage()//MyHomePage1()
+    home: MyHomePage1()
       
       )
       );

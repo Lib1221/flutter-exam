@@ -81,6 +81,7 @@ class myapping extends StatelessWidget {
       initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
+        '/social':(context)=> const socialSubjects(),
         '/natural':(context)=> const NaturalSubjects(),
         '/home': (context) => const Select(),
         '/sign-in': (context) => SignInScreen(
@@ -151,6 +152,7 @@ class myapping extends StatelessWidget {
               ],
               children: const [
                 Selector()
+                
                 
               ],
             ),
