@@ -19,11 +19,7 @@ class ResultScreen extends StatelessWidget {
             ),
           ),
           percentage(score, len),
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/natural');
-              },
-              child: const Text('Go back'))
+         
         ],
       ),
     );
