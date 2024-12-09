@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_store/main_page/screens/quiz_screen.dart';
-import 'package:exam_store/main_page/screens/result_screen.dart';
 import 'package:exam_store/progress/daily.dart';
 import 'package:flutter/material.dart';
 

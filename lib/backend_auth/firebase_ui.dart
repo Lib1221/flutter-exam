@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class myapping extends StatelessWidget {
+class myapping extends StatelessWidget { // Changed class name to myapping
   const myapping({super.key});
 
   @override
@@ -81,8 +81,8 @@ class myapping extends StatelessWidget {
       initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
-        '/social':(context)=> const socialSubjects(),
-        '/natural':(context)=> const NaturalSubjects(),
+        '/social': (context) => const socialSubjects(),
+        '/natural': (context) => const NaturalSubjects(),
         '/home': (context) => const Select(),
         '/sign-in': (context) => SignInScreen(
               providers: providers,
@@ -100,15 +100,12 @@ class myapping extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      SvgPicture.asset(
-                        'assets/a.svg',
-                        height: 100,
-                      ),
+                      SvgPicture.asset('assets/a.svg', height: 100),
                       const SizedBox(height: 20),
                       const Text(
                         'Welcome to Examers!',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        style:
+                            TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -118,45 +115,27 @@ class myapping extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Welcome to Examers!',
-                          style: TextStyle(
-                              fontSize: 40, fontWeight: FontWeight.bold),
-                        ),
-                        SvgPicture.asset(
-                          'assets/a.svg',
-                          height: 300,
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-        '/profile': (context) => ProfileScreen(
-              providers: providers,
-              showDeleteConfirmationDialog: true,
-              actions: [
-                SignedOutAction((context) {
-                  Navigator.pushReplacementNamed(context, '/sign-in');
-                }),
-            AccountDeletedAction((context, user) {
-              Navigator.pushReplacementNamed(context, '/sign-in');
-
-    }),
-              ],
-              children: const [
-                Selector()
+                    child:
+                        Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:
+                        CrossAxisAlignment.center, children:[
+                          const Text('Welcome to Examers!', style:
+                          TextStyle(fontSize:
+                          40, fontWeight:
+                          FontWeight.bold),), SvgPicture.asset('assets/a.svg', height:
+                          300,), const SizedBox(height:
+                          20),],),),);},
+                ),
                 
-                
-              ],
-            ),
-      },
-    );
+        '/profile': (context) => ProfileScreen( 
+                  providers:providers, 
+                  showDeleteConfirmationDialog:true,
+                   actions:[ SignedOutAction((context) {
+                     Navigator.pushReplacementNamed(context, '/sign-in'); 
+                     }), 
+                     AccountDeletedAction((context, user) { 
+                      Navigator.pushReplacementNamed(context, '/sign-in'); }),], 
+                      children:const [Selector()])
+                      },
+  );
   }
-}
+  }

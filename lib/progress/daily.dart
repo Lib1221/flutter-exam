@@ -1,9 +1,7 @@
 // ignore_for_file: avoid_types_as_parameter_names
 
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_store/user/User.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,22 +17,37 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
   int _heatmapper = 0;
   int c = 0;
   int zero = 1;
+
   Map<DateTime, int> dailyStrikes = {};
   @override
   void initState() {
     super.initState();
     _restoreState();
-    saveDailyStrikeData(5);
+    counterRetriever();
+    saveDailyStrikeData(_heatmapper);
     _loadDailyStrikes();
-    ;
+  }
+
+  Future<void> counter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('lastDate', DateTime.now().toIso8601String().split('T')[0]);
+  }
+
+  Future<void> counterRetriever() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    counter();
+    _heatmapper = prefs.getInt('c_ter')??0;
+    if (prefs.getString('lastDate') !=
+        DateTime.now().toIso8601String().split('T')[0]) {
+      prefs.setInt('c_ter', 0);
+      _heatmapper = 0;
+      setState(() {});
+    }
   }
 
   Future<void> _loadDailyStrikes() async {
     dailyStrikes = await getDailyStrikeData();
-    setState(() {
-      print(dailyStrikes);
-      print(DateTime(2024, 1, 6));
-    });
+    setState(() {});
   }
 
   void startTimer() async {
@@ -57,9 +70,9 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
 
         setState(() {
           _start = 3600;
-          if (_heatmapper <= 5) {
-            _heatmapper += 1;
-          }
+          _heatmapper += 1;
+          prefs.setInt('c_ter', _heatmapper);
+          saveDailyStrikeData(_heatmapper);
         });
       }
       c = 0;
@@ -117,61 +130,68 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Daily progress'),
+        title: const Text('Your Daily Progress'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SingleChildScrollView(
-              child: HeatMapCalendar(
-                defaultColor: Colors.white,
-                colorMode: ColorMode.color,
-                flexible: false,
-                datasets: dailyStrikes,
-                colorsets: const {
-                  1: Color.fromARGB(255, 141, 221, 201),
-                  2: Color.fromARGB(255, 59, 162, 100),
-                  3: Color.fromARGB(255, 15, 35, 212),
-                  4: Color.fromARGB(255, 190, 255, 9),
-                  5: Color.fromARGB(255, 206, 22, 22),
-                },
-                onClick: (value) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(value.toString())));
-                },
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      formatTime(_start),
-                      style: const TextStyle(fontSize: 48),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _start == 3600 ? startTimer : Stop,
-                      child: _start == 3600
-                          ? const Text("Start Countdown")
-                          : const Text("Stop Countdown"),
-                    ),
-                  ],
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context)
+              .copyWith(scrollbars: false), // Disable scrollbars,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                HeatMapCalendar(
+                  defaultColor: Colors.white,
+                  colorMode: ColorMode.color,
+                  datasets: dailyStrikes.isNotEmpty ? dailyStrikes : {},
+                  colorsets:const {
+                          1: Color.fromARGB(255, 141, 221, 201), // Light Green
+                          2: Color.fromARGB(255, 59, 162, 100),  // Medium Light Green
+                          3: Color.fromARGB(255, 30, 120, 50),   // Medium Green
+                          4: Color.fromARGB(255, 15, 80, 30),    // Darker Green
+                          5: Color.fromARGB(255, 0, 50, 20),     // Dark Green
+                          
+                          6: Color.fromARGB(255, 255, 200, 200), // Light Red
+                          7: Color.fromARGB(255, 255, 150, 150), // Medium Light Red
+                          8: Color.fromARGB(255, 255, 100, 100), // Medium Red
+                          9: Color.fromARGB(255, 220, 50, 50),   // Strong Red
+                          10: Color.fromARGB(255, 180, 20, 20),   // Darker Red
+                        },
+                  onClick: (value) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(value.toString())));
+                  },
                 ),
-              ),
-            ),
-            const Text("Top Rated student "),
-            const Divider(
-              height: 10,
-              thickness: 5,
-              indent: 10,
-              color: Colors.green,
-            ),
-            Expanded(
-              child: ListView.builder(
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        formatTime(_start),
+                        style: const TextStyle(fontSize: 48),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _start == 3600 ? startTimer : Stop,
+                        child: _start == 3600
+                            ? const Text("Start Countdown")
+                            : const Text("Stop Countdown"),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text("Top Rated Student"),
+                const Divider(
+                  height: 10,
+                  thickness: 5,
+                  indent: 10,
+                  color: Colors.green,
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: 10,
                   itemBuilder: (context, index) {
                     return Card(
@@ -180,12 +200,14 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                       elevation: 10,
                       child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: Text("Liben Adugna--> ${index + 1} "),
+                        child: Text("Liben Adugna --> ${index + 1} "),
                       ),
                     );
-                  }),
-            )
-          ],
+                  },
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

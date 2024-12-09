@@ -6,21 +6,38 @@ import 'package:flutter/material.dart';
 import 'package:tbib_splash_screen/splash_screen.dart';
 
 class MyHomePage1 extends StatefulWidget {
-
   const MyHomePage1({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage1> createState() => _MyHomePage1State();
 }
 
-class _MyHomePage1State extends State<MyHomePage1> {
+class _MyHomePage1State extends State<MyHomePage1> with SingleTickerProviderStateMixin {
   bool isLoaded = false;
+  late final AnimationController _controller;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 10)).then((value) => setState(() {
-          isLoaded = true;
-        }));
+    _controller = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    );
+
+    Future.delayed(const Duration(seconds: 5)).then((value) {
+      setState(() {
+        isLoaded = true;
+      });
+      _controller.dispose();
+    });
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); 
+    super.dispose();
   }
 
   @override
@@ -28,7 +45,8 @@ class _MyHomePage1State extends State<MyHomePage1> {
     return SplashScreenView(
       duration: const Duration(seconds: 1),
       navigateWhere: isLoaded,
-      navigateRoute: const myapping(), backgroundColor: Colors.white,
+      navigateRoute: const myapping(), 
+      backgroundColor: Colors.white,
       text: WavyAnimatedText(
         "LOADING",
         textAlign: TextAlign.center,
@@ -36,14 +54,13 @@ class _MyHomePage1State extends State<MyHomePage1> {
           color: Colors.red,
           fontSize: 40.0,
           fontWeight: FontWeight.bold,
-        ),      
-      ), 
+        ),
+      ),
       imageSrc: null,
-      //  displayLoading: false,
+      displayLoading: false,
     );
   }
 }
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
