@@ -14,35 +14,42 @@ class HeatmapCalendarPage extends StatefulWidget {
 class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
   Timer? _timer;
   int _start = 3600;
-  int _heatmapper = 0;
   int c = 0;
   int zero = 1;
+  int _heatmapper = 0;
+  String? _lastUpdatedDate;
 
   Map<DateTime, int> dailyStrikes = {};
   @override
   void initState() {
     super.initState();
     _restoreState();
-    counterRetriever();
     saveDailyStrikeData(_heatmapper);
     _loadDailyStrikes();
+    _loadCounter();
   }
 
-  Future<void> counter() async {
+  Future<void> _loadCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('lastDate', DateTime.now().toIso8601String().split('T')[0]);
+    setState(() {
+      _heatmapper = prefs.getInt('counter') ?? 0;
+      _lastUpdatedDate = prefs.getString('lastUpdatedDate');
+
+      String todayDate = DateTime.now().toIso8601String().split('T')[0];
+
+      if (_lastUpdatedDate != todayDate) {
+        _heatmapper = 0;
+      }
+      prefs.setString('lastUpdatedDate', todayDate);
+    });
   }
 
-  Future<void> counterRetriever() async {
+  Future<void> _incrementCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    counter();
-    _heatmapper = prefs.getInt('c_ter')??0;
-    if (prefs.getString('lastDate') !=
-        DateTime.now().toIso8601String().split('T')[0]) {
-      prefs.setInt('c_ter', 0);
-      _heatmapper = 0;
-      setState(() {});
-    }
+    setState(() {
+      _heatmapper++;
+      prefs.setInt('counter', _heatmapper);
+    });
   }
 
   Future<void> _loadDailyStrikes() async {
@@ -67,13 +74,8 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
         timer.cancel();
         showCompletionMessage(zero == 1 ? 'Time is up!' : 'Time canceled');
         zero = 1;
-
-        setState(() {
-          _start = 3600;
-          _heatmapper += 1;
-          prefs.setInt('c_ter', _heatmapper);
-          saveDailyStrikeData(_heatmapper);
-        });
+        _incrementCounter();
+        saveDailyStrikeData(_heatmapper);
       }
       c = 0;
     });
@@ -145,19 +147,19 @@ class _HeatmapCalendarPageState extends State<HeatmapCalendarPage> {
                   defaultColor: Colors.white,
                   colorMode: ColorMode.color,
                   datasets: dailyStrikes.isNotEmpty ? dailyStrikes : {},
-                  colorsets:const {
-                          1: Color.fromARGB(255, 141, 221, 201), // Light Green
-                          2: Color.fromARGB(255, 59, 162, 100),  // Medium Light Green
-                          3: Color.fromARGB(255, 30, 120, 50),   // Medium Green
-                          4: Color.fromARGB(255, 15, 80, 30),    // Darker Green
-                          5: Color.fromARGB(255, 0, 50, 20),     // Dark Green
-                          
-                          6: Color.fromARGB(255, 255, 200, 200), // Light Red
-                          7: Color.fromARGB(255, 255, 150, 150), // Medium Light Red
-                          8: Color.fromARGB(255, 255, 100, 100), // Medium Red
-                          9: Color.fromARGB(255, 220, 50, 50),   // Strong Red
-                          10: Color.fromARGB(255, 180, 20, 20),   // Darker Red
-                        },
+                  colorsets: const {
+                    1: Color.fromARGB(255, 141, 221, 201), // Light Green
+                    2: Color.fromARGB(255, 59, 162, 100), // Medium Light Green
+                    3: Color.fromARGB(255, 30, 120, 50), // Medium Green
+                    4: Color.fromARGB(255, 15, 80, 30), // Darker Green
+                    5: Color.fromARGB(255, 0, 50, 20), // Dark Green
+
+                    6: Color.fromARGB(255, 255, 200, 200), // Light Red
+                    7: Color.fromARGB(255, 255, 150, 150), // Medium Light Red
+                    8: Color.fromARGB(255, 255, 100, 100), // Medium Red
+                    9: Color.fromARGB(255, 220, 50, 50), // Strong Red
+                    10: Color.fromARGB(255, 180, 20, 20), // Darker Red
+                  },
                   onClick: (value) {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(value.toString())));

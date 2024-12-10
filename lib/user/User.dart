@@ -5,60 +5,64 @@ Future<void> saveDailyStrikeData(int streakCount) async {
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-
     String todayDate = DateTime.now().toIso8601String().split('T')[0];
 
     DocumentSnapshot docSnapshot = await users.doc(user.uid).get();
 
+    if (!docSnapshot.exists) {
+      await users.doc(user.uid).set({
+        'dailyStrikes': [],
+      });
+      print("New user document created.");
+    }
+
+    docSnapshot = await users.doc(user.uid).get();
+    
     bool alreadyExists = false;
-    int existingStreakCount = 0; 
+    int existingStreakCount = 0;
 
-    if (docSnapshot.exists) {
-      Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+    Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
 
-      if (data != null && data['dailyStrikes'] != null) {
-        for (var entry in data['dailyStrikes']) {
-          if (entry['date'] == todayDate) {
-            alreadyExists = true;
-            existingStreakCount =
-                entry['streakCount'] as int; 
-            break;
-          }
+    if (data != null && data['dailyStrikes'] != null) {
+      for (var entry in data['dailyStrikes']) {
+        if (entry['date'] == todayDate) {
+          alreadyExists = true;
+          existingStreakCount = entry['streakCount'] as int;
+          break;
         }
       }
+    }
 
-      if (!alreadyExists) {
-        var entry = {
-          'date': todayDate,
-          'streakCount': streakCount,
-        };
+    if (!alreadyExists) {
+      var entry = {
+        'date': todayDate,
+        'streakCount': streakCount,
+      };
 
-        await users.doc(user.uid).set({
-          'dailyStrikes': FieldValue.arrayUnion([entry]),
-        }, SetOptions(merge: true));
+      await users.doc(user.uid).set({
+        'dailyStrikes': FieldValue.arrayUnion([entry]),
+      }, SetOptions(merge: true));
 
-        print("Today's strike data saved.");
-      } else {
-        if (streakCount > existingStreakCount) {
+      print("Today's strike data saved.");
+    } else {
+      if (streakCount > existingStreakCount) {
+        List<dynamic> dailyStrikes = data!['dailyStrikes'];
 
-          List<dynamic> dailyStrikes = data?['dailyStrikes'];
+        int indexToUpdate =
+            dailyStrikes.indexWhere((entry) => entry['date'] == todayDate);
 
-          int indexToUpdate =
-              dailyStrikes.indexWhere((entry) => entry['date'] == todayDate);
+        if (indexToUpdate != -1) {
+          dailyStrikes[indexToUpdate]['streakCount'] = streakCount;
 
-          if (indexToUpdate != -1) {
-            dailyStrikes[indexToUpdate]['streakCount'] = streakCount;
+          await users.doc(user.uid).set({
+            'dailyStrikes': dailyStrikes,
+          }, SetOptions(merge: true));
 
-            await users.doc(user.uid).set({
-              'dailyStrikes': dailyStrikes,
-            }, SetOptions(merge: true));
-
-            print("Today's strike data updated.");
-          }
-        } else {
-          print(
-              "New streak count is not greater than the existing one. No update made.");
+          print("Today's strike data updated.");
         }
+      } else {
+        print(
+            "New streak count is not greater than the existing one. No update made.");
       }
     }
   } else {
