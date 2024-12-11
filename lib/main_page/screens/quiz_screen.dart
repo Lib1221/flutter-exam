@@ -5,6 +5,7 @@ import 'package:exam_store/main_page/next_button.dart';
 import 'package:exam_store/main_page/screens/result_screen.dart';
 import 'package:exam_store/progress/daily.dart';
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class QuizScreen extends StatefulWidget {
   final String collectionPath;
@@ -27,11 +28,67 @@ class _QuizScreenState extends State<QuizScreen> {
   int questionIndex = 0;
   int score = 0;
   List<Question> questions = [];
+  String prompt = "";
 
   @override
   void initState() {
     super.initState();
-    dataRetrive(widget.grade, widget.year, widget.unit); // Call dataRetrive here
+    dataRetrive(
+        widget.grade, widget.year, widget.unit); // Call dataRetrive here
+  }
+
+  final String apiKey =
+      'AIzaSyCU1LfkMOGQoUG5O6sebLsktl5E_CJ4r70'; // Replace with your actual API key
+  String responseText = '';
+
+  Future<void> generateResponse(String prompt) async {
+    final model = GenerativeModel(
+      model: 'gemini-1.5-flash-latest', // Specify the model you want to use
+      apiKey: apiKey,
+    );
+
+    final content = [Content.text(prompt)];
+    try {
+      final response = await model.generateContent(content);
+      setState(() {
+        responseText = response.text ??
+            'No response received'; // Update state with response text
+      });
+    } catch (error) {
+      setState(() {
+        responseText = 'Error: $error'; // Handle errors gracefully
+      });
+    }
+  }
+
+  Future<void> showMarkdownBottomSheet(BuildContext context, String prompt) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true, // Allows bottom sheet to be scrollable
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(10),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                prompt.isNotEmpty?Text(prompt):Text('fetching the data'),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> dataRetrive(String grade, String year, String unit) async {
@@ -85,19 +142,18 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quiz App'),
+        title: const Text('Exam Room'),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.cyan
-            ),
-            onPressed: (){
-            Navigator.push(context, MaterialPageRoute(
-          builder: (context) => HeatmapCalendarPage()),);
-          }, 
-          child: const Text('Progress Tracker'))
-          ,
-          
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HeatmapCalendarPage()),
+                );
+              },
+              child: const Text('Progress Tracker')),
           IconButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/profile');
@@ -113,11 +169,6 @@ class _QuizScreenState extends State<QuizScreen> {
           children: [
             Text(
               question.question,
-              style: const TextStyle(fontSize: 21),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              (question.year + question.grade + question.unit),
               style: const TextStyle(fontSize: 21),
               textAlign: TextAlign.center,
             ),
@@ -138,6 +189,28 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                 );
               },
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: RectangularButton(
+                        onPressed: () {
+                          prompt =
+                              "anwer these question briefly and detailed also suggest the anwer" +
+                                  question.question +
+                                  "here it is the chooses";
+                          for (String i in question.options) {
+                            prompt += i + " ";
+                          }
+                          generateResponse(prompt);
+                          prompt = "";
+                          showMarkdownBottomSheet(context, responseText);
+                        },
+                        label: 'Ai Detailed Answer')),
+                Expanded(
+                    child: RectangularButton(
+                        onPressed: () {}, label: 'Discussion')),
+              ],
             ),
             isLastQuestion
                 ? RectangularButton(

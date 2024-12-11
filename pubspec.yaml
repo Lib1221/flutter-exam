@@ -43,6 +43,8 @@ dependencies:
   flutter_svg:
   flutter_heatmap_calendar: ^1.0.5
   shared_preferences:
+  google_generative_ai: ^0.4.6
+  flutter_markdown: 
 dev_dependencies:
   flutter_test:
     sdk: flutter
