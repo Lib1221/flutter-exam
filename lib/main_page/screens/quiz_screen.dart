@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:exam_store/Discussion/discuss.dart';
 import 'package:exam_store/main_page/answer_card.dart';
 import 'package:exam_store/main_page/models/question.dart';
 import 'package:exam_store/main_page/next_button.dart';
@@ -28,22 +29,22 @@ class _QuizScreenState extends State<QuizScreen> {
   int questionIndex = 0;
   int score = 0;
   List<Question> questions = [];
+  List<Discussions> discussion = [];
   String prompt = "";
 
   @override
   void initState() {
     super.initState();
-    dataRetrive(
-        widget.grade, widget.year, widget.unit); // Call dataRetrive here
+    dataRetrive(widget.grade, widget.year, widget.unit);
   }
 
-  final String apiKey =
-      'AIzaSyCU1LfkMOGQoUG5O6sebLsktl5E_CJ4r70'; // Replace with your actual API key
+  final String apiKey = "";
+  final String apimodel = 'gemini-1.5-flash-latest';
   String responseText = '';
 
   Future<void> generateResponse(String prompt) async {
     final model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest', // Specify the model you want to use
+      model: apimodel,
       apiKey: apiKey,
     );
 
@@ -51,12 +52,11 @@ class _QuizScreenState extends State<QuizScreen> {
     try {
       final response = await model.generateContent(content);
       setState(() {
-        responseText = response.text ??
-            'No response received'; // Update state with response text
+        responseText = response.text ?? 'No response received';
       });
     } catch (error) {
       setState(() {
-        responseText = 'Error: $error'; // Handle errors gracefully
+        responseText = 'Error: $error';
       });
     }
   }
@@ -64,7 +64,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Future<void> showMarkdownBottomSheet(BuildContext context, String prompt) {
     return showModalBottomSheet<void>(
       context: context,
-      isScrollControlled: true, // Allows bottom sheet to be scrollable
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -75,7 +75,9 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                prompt.isNotEmpty?Text(prompt):Text('fetching the data'),
+                prompt.isNotEmpty
+                    ? Text(prompt)
+                    : Center(child: CircularProgressIndicator()),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
@@ -91,6 +93,10 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+ 
+ 
+  // Function to submit the discussion
+  
   Future<void> dataRetrive(String grade, String year, String unit) async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -133,7 +139,6 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
-      // Show loading or empty state while fetching questions
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -142,7 +147,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Exam Room'),
+        title: const Text('Examers Room'),
         actions: [
           ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
@@ -196,7 +201,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: RectangularButton(
                         onPressed: () {
                           prompt =
-                              "anwer these question briefly and detailed also suggest the anwer" +
+                              "answer these question briefly and detailed also suggest the answer also try to give a information about each options help student by relating the answer with ethiopian ministry of eduction  " +
                                   question.question +
                                   "here it is the chooses";
                           for (String i in question.options) {
@@ -206,10 +211,14 @@ class _QuizScreenState extends State<QuizScreen> {
                           prompt = "";
                           showMarkdownBottomSheet(context, responseText);
                         },
-                        label: 'Ai Detailed Answer')),
+                        label: 'Ai Answer')),
                 Expanded(
                     child: RectangularButton(
-                        onPressed: () {}, label: 'Discussion')),
+                        onPressed: () {
+                         Navigator.push(context, MaterialPageRoute(
+          builder: (context) => DiscussionFormState(documentId:question.documentId,)),);
+                        },
+                        label: 'Discussion')),
               ],
             ),
             isLastQuestion
