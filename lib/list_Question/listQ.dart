@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_store/main_page/screens/quiz_screen.dart';
+import 'package:exam_store/progress/daily.dart';
 import 'package:flutter/material.dart';
 
 class ListQuestions extends StatefulWidget {
@@ -70,6 +71,18 @@ class _ListQuestionsState extends State<ListQuestions> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.collectionPath),
+        actions: [
+            ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyan
+            ),
+            onPressed: (){
+            Navigator.push(context, MaterialPageRoute(
+          builder: (context) => HeatmapCalendarPage()),);
+          }, 
+          child: const Text('Progress Tracker'))
+          ,
+        ],
       ),
       body: isLoading 
           ? const Center(child: CircularProgressIndicator())
@@ -166,10 +179,15 @@ class _ListQuestionsState extends State<ListQuestions> {
               ),
             );
           },
-          child: Text(
-            'Grade $grade - Unit $unit (Questions Count: $itemCount)',
-            style:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          child: Row(
+            children: [
+              Text(
+                'Grade $grade - Unit $unit (Questions Count: $itemCount)',
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+
+            ],
           ),
         ),
       ),

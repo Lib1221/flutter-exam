@@ -11,7 +11,7 @@ class Selector extends StatelessWidget {
         children: [
           ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/natural');
+                Navigator.pushNamed(context, '/natural');
               },
               child: const Text('Natural science')),
           const SizedBox(
@@ -19,7 +19,7 @@ class Selector extends StatelessWidget {
           ),
           ElevatedButton(
               onPressed: () {
-                print('');
+                Navigator.pushNamed(context, '/social');
               },
               child: const Text('Social science')),
         ],

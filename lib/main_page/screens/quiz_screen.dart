@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:exam_store/Discussion/discuss.dart';
 import 'package:exam_store/main_page/answer_card.dart';
 import 'package:exam_store/main_page/models/question.dart';
 import 'package:exam_store/main_page/next_button.dart';
 import 'package:exam_store/main_page/screens/result_screen.dart';
+import 'package:exam_store/progress/daily.dart';
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class QuizScreen extends StatefulWidget {
   final String collectionPath;
@@ -26,13 +29,74 @@ class _QuizScreenState extends State<QuizScreen> {
   int questionIndex = 0;
   int score = 0;
   List<Question> questions = [];
+  List<Discussions> discussion = [];
+  String prompt = "";
 
   @override
   void initState() {
     super.initState();
-    dataRetrive(widget.grade, widget.year, widget.unit); // Call dataRetrive here
+    dataRetrive(widget.grade, widget.year, widget.unit);
   }
 
+  final String apiKey = "";
+  final String apimodel = 'gemini-1.5-flash-latest';
+  String responseText = '';
+
+  Future<void> generateResponse(String prompt) async {
+    final model = GenerativeModel(
+      model: apimodel,
+      apiKey: apiKey,
+    );
+
+    final content = [Content.text(prompt)];
+    try {
+      final response = await model.generateContent(content);
+      setState(() {
+        responseText = response.text ?? 'No response received';
+      });
+    } catch (error) {
+      setState(() {
+        responseText = 'Error: $error';
+      });
+    }
+  }
+
+  Future<void> showMarkdownBottomSheet(BuildContext context, String prompt) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(10),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                prompt.isNotEmpty
+                    ? Text(prompt)
+                    : Center(child: CircularProgressIndicator()),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+ 
+ 
+  // Function to submit the discussion
+  
   Future<void> dataRetrive(String grade, String year, String unit) async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -75,7 +139,6 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
-      // Show loading or empty state while fetching questions
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -84,8 +147,18 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quiz App'),
+        title: const Text('Examers Room'),
         actions: [
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HeatmapCalendarPage()),
+                );
+              },
+              child: const Text('Progress Tracker')),
           IconButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/profile');
@@ -101,11 +174,6 @@ class _QuizScreenState extends State<QuizScreen> {
           children: [
             Text(
               question.question,
-              style: const TextStyle(fontSize: 21),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              (question.year + question.grade + question.unit),
               style: const TextStyle(fontSize: 21),
               textAlign: TextAlign.center,
             ),
@@ -126,6 +194,32 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                 );
               },
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: RectangularButton(
+                        onPressed: () {
+                          prompt =
+                              "answer these question briefly and detailed also suggest the answer also try to give a information about each options help student by relating the answer with ethiopian ministry of eduction  " +
+                                  question.question +
+                                  "here it is the chooses";
+                          for (String i in question.options) {
+                            prompt += i + " ";
+                          }
+                          generateResponse(prompt);
+                          prompt = "";
+                          showMarkdownBottomSheet(context, responseText);
+                        },
+                        label: 'Ai Answer')),
+                Expanded(
+                    child: RectangularButton(
+                        onPressed: () {
+                         Navigator.push(context, MaterialPageRoute(
+          builder: (context) => DiscussionFormState(documentId:question.documentId,)),);
+                        },
+                        label: 'Discussion')),
+              ],
             ),
             isLastQuestion
                 ? RectangularButton(

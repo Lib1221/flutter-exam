@@ -42,9 +42,18 @@ dependencies:
   firebase_ui_auth: ^1.16.0
   flutter_svg:
   flutter_heatmap_calendar: ^1.0.5
+  shared_preferences:
+  google_generative_ai: ^0.4.6
+  flutter_markdown: 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.14.2"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/books.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
