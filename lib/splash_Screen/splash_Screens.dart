@@ -13,7 +13,7 @@ class MyHomePage1 extends StatefulWidget {
 }
 
 class _MyHomePage1State extends State<MyHomePage1> with SingleTickerProviderStateMixin {
-  bool isLoaded = false;
+   bool isLoaded = false;
   late final AnimationController _controller;
 
   @override
@@ -23,15 +23,15 @@ class _MyHomePage1State extends State<MyHomePage1> with SingleTickerProviderStat
       duration: const Duration(seconds: 10),
       vsync: this,
     );
-
-    Future.delayed(const Duration(seconds: 5)).then((value) {
-      setState(() {
-        isLoaded = true;
-      });
-      _controller.dispose();
-    });
-
     _controller.forward();
+
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) { // Check if the widget is still mounted before calling setState
+        setState(() {
+          isLoaded = true;
+        });
+      }
+    });
   }
 
   @override
@@ -39,8 +39,6 @@ class _MyHomePage1State extends State<MyHomePage1> with SingleTickerProviderStat
     _controller.dispose(); 
     super.dispose();
   }
-
-  @override
   Widget build(BuildContext context) {
     return SplashScreenView(
       duration: const Duration(seconds: 1),
@@ -62,15 +60,3 @@ class _MyHomePage1State extends State<MyHomePage1> with SingleTickerProviderStat
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text("Home Page"),
-      ),
-    );
-  }
-}
