@@ -47,3 +47,11 @@ Flutter, Dart, Firebase Auth, Cloud Firestore.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Documentation
+
+Developer docs live in [`docs/`](docs/):
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Setup](docs/SETUP.md)
+- [Contributing](docs/CONTRIBUTING.md)
